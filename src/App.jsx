@@ -8,11 +8,15 @@ import Items from "./pages/Items";
 import Supplier from "./pages/Supplier";
 import UpdateSupplier from "./pages/item/UpdateSupplier";
 import SupplierDetail from "./pages/item/SupplierDetail";
+import Login from "./auth/Login";
+import AuthAdmin from "./auth/AuthAdmin";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/table" element={<TableItem />} />
         <Route path="/items" element={<Items />} />
@@ -21,9 +25,13 @@ const App = () => {
         {/* Detail Items */}
         <Route path="detail/:id" element={<ItemDetail />} />
         <Route path="detail-supplier/:id" element={<SupplierDetail />} />
-        {/* Edit Items */}
-        <Route path="edit/:id" element={<UpdateItem />}></Route>
-        <Route path="edit-supplier/:id" element={<UpdateSupplier />}></Route>
+
+        {/* Auth Admin */}
+        <Route element={<AuthAdmin />}>
+          {/* Edit Items */}
+          <Route path="edit/:id" element={<UpdateItem />}></Route>
+          <Route path="edit-supplier/:id" element={<UpdateSupplier />}></Route>
+        </Route>
       </Routes>
     </BrowserRouter>
   );

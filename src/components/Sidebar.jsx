@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // const { role } = useAuth();
 
   return (
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="block md:hidden p-4 text-white bg-fuchsia-950"
+        className="block md:hidden p-4 text-white bg-fuchsia-950 dark:bg-gray-700"
       >
         {isOpen ? (
           <svg
@@ -40,7 +43,7 @@ const Sidebar = () => {
       <aside
         className={`${
           isOpen ? "block" : "hidden"
-        } md:block md:w-1/5 w-full bg-fuchsia-950 text-white h-full md:h-auto fixed md:relative z-50`}
+        } md:block md:w-1/5 w-full bg-fuchsia-950 dark:bg-gray-700 text-white h-full md:h-auto fixed md:relative z-50`}
       >
         <div className="h-20 shadow-lg flex justify-between items-center px-4">
           <h2 className="flex items-center text-2xl font-bold gap-1 just">
@@ -99,7 +102,9 @@ const LinkSidebar = ({ link, children }) => {
     <Link
       to={link}
       className={`${
-        location.pathname === link ? "text-fuchsia-400" : ""
+        location.pathname === link
+          ? "text-fuchsia-400 dark:text-fuchsia-300"
+          : ""
       } flex items-center gap-2 text-xl`}
     >
       {children}

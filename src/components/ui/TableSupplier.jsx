@@ -9,6 +9,7 @@ import {
   Pagination,
   getKeyValue,
   Tooltip,
+  Button,
 } from "@nextui-org/react";
 import { EyeIcon } from "./icons/EyeIcon";
 import { EditIcon } from "./icons/EditIcon";
@@ -16,6 +17,7 @@ import { DeleteIcon } from "./icons/DeleteIcon";
 import { Link } from "react-router-dom";
 import { supabase } from "../../utils/SupaClient";
 import Swal from "sweetalert2";
+import { useAuth } from "../../auth/AuthProvider";
 
 const columns = [
   {
@@ -45,6 +47,8 @@ const columns = [
 ];
 
 export default function TableSupplier({ allSupplier }) {
+  const { user, role } = useAuth();
+
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 5;
 
@@ -107,14 +111,12 @@ export default function TableSupplier({ allSupplier }) {
         </div>
       }
       classNames={{
-        wrapper: "min-h-[222px] bg-[#EBD3F8]",
+        wrapper: "min-h-[222px]",
       }}
     >
       <TableHeader>
         {columns.map((col) => (
-          <TableColumn key={col.key} className="bg-[#D7C3F1] text-black">
-            {col.label}
-          </TableColumn>
+          <TableColumn key={col.key}>{col.label}</TableColumn>
         ))}
       </TableHeader>
       <TableBody items={items}>
@@ -130,28 +132,36 @@ export default function TableSupplier({ allSupplier }) {
                   />
                 ) : columnKey === "action" ? (
                   <div className="relative flex items-center gap-6">
-                    <Link to={`/detail-supplier/${supplier.id}`}>
-                      <Tooltip content="Details">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                          <EyeIcon />
-                        </span>
-                      </Tooltip>
-                    </Link>
-                    <Link to={`/edit-supplier/${supplier.id}`}>
-                      <Tooltip content="Edit item">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                          <EditIcon />
-                        </span>
-                      </Tooltip>
-                    </Link>
-                    <Tooltip color="danger" content="Delete item">
-                      <span
-                        className="text-lg text-danger cursor-pointer active:opacity-50"
-                        onClick={() => deleteSupplierById(supplier.id)}
-                      >
-                        <DeleteIcon />
-                      </span>
-                    </Tooltip>
+                    {user && role === "admin" ? (
+                      <>
+                        <Link to={`/detail-supplier/${supplier.id}`}>
+                          <Tooltip content="Details">
+                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                              <EyeIcon />
+                            </span>
+                          </Tooltip>
+                        </Link>
+                        <Link to={`/edit-supplier/${supplier.id}`}>
+                          <Tooltip content="Edit item">
+                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                              <EditIcon />
+                            </span>
+                          </Tooltip>
+                        </Link>
+                        <Tooltip color="danger" content="Delete item">
+                          <span
+                            className="text-lg text-danger cursor-pointer active:opacity-50"
+                            onClick={() => deleteSupplierById(supplier.id)}
+                          >
+                            <DeleteIcon />
+                          </span>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <Link to={`/detail-supplier/${supplier.id}`}>
+                        <Button color="secondary">Details</Button>
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   getKeyValue(supplier, columnKey) || "N/A" // Render default value

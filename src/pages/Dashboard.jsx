@@ -63,7 +63,7 @@ const Dashboard = () => {
   return (
     <Layout>
       <section id="dashboard" className="p-10">
-        <div className="bg-fuchsia-900 text-white rounded-lg h-48 p-6 md:p-10 shadow-xl flex flex-col justify-center">
+        <div className="bg-fuchsia-900 dark:bg-gray-700 text-white rounded-lg h-48 p-6 md:p-10 shadow-xl flex flex-col justify-center">
           <h2 className="text-2xl md:text-4xl font-semibold mb-2">
             Welcome, Admin
           </h2>
@@ -82,23 +82,23 @@ const Dashboard = () => {
             </>
           ) : (
             <>
-              <div className="p-8 h-48 rounded-lg shadow-xl bg-red-600 text-white">
+              <div className="p-8 h-48 rounded-lg shadow-xl bg-red-600 text-white dark:bg-gray-900">
                 <h2 className="text-2xl font-bold">Total Food & Drink</h2>
                 <p className="text-5xl font-bold mt-2">{item} Item</p>
               </div>
-              <div className="p-8 h-48 rounded-lg shadow-xl bg-green-600 text-white">
+              <div className="p-8 h-48 rounded-lg shadow-xl bg-green-600 text-white dark:bg-gray-900">
                 <h2 className="text-2xl font-bold">Total Food</h2>
                 <p className="text-5xl font-bold mt-2">
                   {countTypeItem.food} Item
                 </p>
               </div>
-              <div className="p-8 h-48 rounded-lg shadow-xl bg-blue-500 text-white">
+              <div className="p-8 h-48 rounded-lg shadow-xl bg-blue-500 text-white dark:bg-gray-900">
                 <h2 className="text-2xl font-bold">Total Drink</h2>
                 <p className="text-5xl font-bold mt-2">
                   {countTypeItem.drink} Item
                 </p>
               </div>
-              <div className="p-8 h-48 rounded-lg shadow-xl bg-yellow-500 text-white">
+              <div className="p-8 h-48 rounded-lg shadow-xl bg-yellow-500 text-white dark:bg-gray-900">
                 <h2 className="text-2xl font-bold">Total Suppliers</h2>
                 <p className="text-5xl font-bold mt-2">
                   {totalSuppliers} Supplier

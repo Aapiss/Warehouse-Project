@@ -9,7 +9,6 @@ import {
   Input,
   Select,
   SelectItem,
-  Textarea,
 } from "@nextui-org/react";
 import { supabase } from "../../utils/SupaClient";
 import Swal from "sweetalert2";
@@ -31,20 +30,66 @@ export default function ModalAddItem({ isOpen, onOpenChange }) {
   const handlerSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await supabase.from("item").insert(formData).select();
+      const { data: uploadImage, error: uploadError } = await supabase.storage
+        .from("ErbeImage")
+        .upload(
+          `image_product/${formData.image_item.name}`,
+          formData.image_item,
+          {
+            cacheControl: "3600",
+            upsert: true,
+          }
+        );
 
-      if (data) {
-        Swal.fire({
-          title: "Success",
-          text: "Data has been added",
-          icon: "success",
-        }).then(() => {
-          window.location.reload();
-        });
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      if (uploadImage) {
+        const imageUrl = supabase.storage
+          .from("ErbeImage")
+          .getPublicUrl(`image_product/${formData.image_item.name}`)
+          .data.publicUrl;
+
+        const updateFormData = {
+          ...formData,
+          image_item: imageUrl,
+        };
+
+        const { data, error } = await supabase
+          .from("item")
+          .insert(updateFormData)
+          .select();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          Swal.fire({
+            title: "Success",
+            text: "Data has been added to Database",
+            icon: "success",
+          }).then(() => {
+            window.location.reload();
+          });
+        }
       }
     } catch (error) {
       console.log(error);
+      Swal.fire({
+        title: "Error",
+        text: "Can't Uploaded Image",
+        icon: "error",
+      });
     }
+  };
+
+  const handleImage = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.files[0],
+    });
   };
 
   const itemType = [
@@ -126,11 +171,9 @@ export default function ModalAddItem({ isOpen, onOpenChange }) {
                 <label className="text-sm font-medium text-gray-700">
                   Image Item
                   <input
-                    required
-                    type="text"
+                    type="file"
                     name="image_item"
-                    value={formData.image_item}
-                    onChange={handlerChange}
+                    onChange={handleImage}
                     className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                 </label>

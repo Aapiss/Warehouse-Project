@@ -4,6 +4,8 @@ import { supabase } from "../utils/SupaClient";
 import { Button, Spinner, useDisclosure } from "@nextui-org/react";
 import TableSupplier from "../components/ui/TableSupplier";
 import ModalAddSupplier from "../components/ui/ModeAddSupplier";
+import { useAuth } from "../auth/AuthProvider";
+import { Link } from "react-router-dom";
 
 const Supplier = () => {
   const [allSupplier, setAllSupplier] = useState([]);
@@ -24,6 +26,8 @@ const Supplier = () => {
     }
   };
 
+  const { user, role } = useAuth();
+
   useEffect(() => {
     getAllSupplier();
     document.getElementById("title").innerHTML = "Supplier";
@@ -38,14 +42,24 @@ const Supplier = () => {
         <section className="p-8">
           <div className="flex justify-between mb-5">
             <h2 className="text-3xl font-semibold">Supplier</h2>
-            <Button color="secondary" onPress={onOpen}>
-              + Add Supplier
-            </Button>
-            <ModalAddSupplier
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              onOpen={onOpen}
-            />
+            {user && role === "admin" ? (
+              <>
+                <Button color="secondary" onPress={onOpen}>
+                  + Add Supplier
+                </Button>
+                <ModalAddSupplier
+                  isOpen={isOpen}
+                  onOpenChange={onOpenChange}
+                  onOpen={onOpen}
+                />
+              </>
+            ) : (
+              <Link to={"/login"}>
+                <Button color="secondary" onPress={onOpen}>
+                  Add for Admin
+                </Button>
+              </Link>
+            )}
           </div>
           <TableSupplier allSupplier={allSupplier} />
         </section>

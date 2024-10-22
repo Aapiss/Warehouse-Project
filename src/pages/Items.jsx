@@ -52,7 +52,7 @@ const Items = () => {
               {currentItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
                 >
                   {/* Image section */}
                   <img

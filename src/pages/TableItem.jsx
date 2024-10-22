@@ -5,6 +5,9 @@ import { supabase } from "../utils/SupaClient";
 import { Spinner } from "@nextui-org/react";
 import { Button, useDisclosure } from "@nextui-org/react";
 import ModalAddItem from "../components/ui/ModalAddItem";
+import { Link } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
+import SearchBar from "../components/SearchBar";
 
 const ItemTable = () => {
   const [allItem, setAllItem] = useState([]);
@@ -30,10 +33,18 @@ const ItemTable = () => {
     }
   };
 
+  const { user, role } = useAuth();
+
   useEffect(() => {
     getAllItem(filter);
     document.getElementById("title").innerHTML = "Table Item";
   }, [filter]);
+
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
 
   return (
     <Layout>
@@ -45,14 +56,26 @@ const ItemTable = () => {
         <section id="table" className="p-8">
           <div className="flex justify-between mb-5">
             <h2 className="text-3xl font-semibold">Table Item</h2>
-            <Button color="secondary" onPress={onOpen}>
-              + Add Item
-            </Button>
-            <ModalAddItem
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              onOpen={onOpen}
-            />
+            {user && role === "admin" ? (
+              <>
+                {/* For Admin */}
+                <Button color="secondary" onPress={onOpen}>
+                  + Add Item
+                </Button>
+                <ModalAddItem
+                  isOpen={isOpen}
+                  onOpenChange={onOpenChange}
+                  onOpen={onOpen}
+                />
+              </>
+            ) : (
+              // For User
+              <Link to={"/login"}>
+                <Button color="secondary" onPress={onOpen}>
+                  Add for Admin
+                </Button>
+              </Link>
+            )}
           </div>
           {/* Filter buttons */}
           <div className="flex space-x-4 mb-5">
@@ -75,7 +98,17 @@ const ItemTable = () => {
               Drink
             </Button>
           </div>
-          <TablePagination allItem={allItem} />
+
+          <div className="my-3">
+            <SearchBar handleSearch={handleSearch} />
+          </div>
+
+          <TablePagination
+            allItem={allItem}
+            user={user}
+            role={role}
+            search={search}
+          />
         </section>
       )}
     </Layout>

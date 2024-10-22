@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, image, Spinner } from "@nextui-org/react";
 import { supabase } from "../../utils/SupaClient";
 import Swal from "sweetalert2";
 
@@ -23,12 +23,10 @@ export default function UpdateItem() {
     image_item: "",
   });
 
-  const handlerChange = (e) => {
-    setFormEdit({
-      ...formEdit,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const [imagePrev, setImagePrev] = useState({
+    preview: "",
+    nextImage: {},
+  });
 
   //   Get Item by ID
   const getItemById = async () => {
@@ -47,31 +45,89 @@ export default function UpdateItem() {
     }
   };
 
+  const handlerChange = (e) => {
+    setFormEdit({
+      ...formEdit,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleImage = (e) => {
+    const previewImage = URL.createObjectURL(e.target.files[0]);
+    setImagePrev({ preview: previewImage, nextImage: e.target.files[0] });
+  };
+
   //   Update ITEM
   const updateItem = async (e) => {
     e.preventDefault();
-
     setLoadingBtn(true);
-    try {
-      const { data } = await supabase
-        .from("item")
-        .update({
-          item_name: formEdit.item_name,
-          item_price: formEdit.item_price,
-          item_type: formEdit.item_type,
-          description: formEdit.description,
-          item_stock: formEdit.item_stock,
-          image_item: formEdit.image_item,
-        })
-        .eq("id", id)
-        .select();
 
-      if (data) {
-        Swal.fire({
-          title: "Success",
-          text: "Data has been updated",
-          icon: "success",
-        }).then(() => navigate("/table"));
+    try {
+      if (imagePrev.preview.length === 0) {
+        const { data: updateData } = await supabase
+          .from("item")
+          .update(formEdit)
+          .eq("id", id)
+          .select();
+
+        if (updateData) {
+          Swal.fire({
+            title: "Success",
+            text: "Data has been Updated",
+            icon: "success",
+          }).then(() => {
+            navigate("/table");
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Updated Failed",
+            icon: "error",
+          });
+        }
+      } else {
+        const removeUrlImage = formEdit.image_item.replace(
+          "https://arhqdstuioabzeolisnj.supabase.co/storage/v1/object/public/ErbeImage/image_product/",
+          ""
+        );
+
+        const { data: deleteImage } = await supabase.storage
+          .from("ErbeImage")
+          .remove(`image_product/${removeUrlImage}`);
+
+        if (deleteImage) {
+          const { data: updateImage } = await supabase.storage
+            .from("ErbeImage")
+            .upload(
+              `image_product/${imagePrev.nextImage.name}`,
+              imagePrev.nextImage,
+              {
+                cacheControl: "3600",
+                upsert: true,
+              }
+            );
+
+          if (updateImage) {
+            const { data } = await supabase
+              .from("item")
+              .update({
+                ...formEdit,
+                image_item: `https://arhqdstuioabzeolisnj.supabase.co/storage/v1/object/public/ErbeImage/image_product/${imagePrev.nextImage.name}`,
+              })
+              .eq("id", id)
+              .select("*");
+
+            if (data) {
+              Swal.fire({
+                title: "Success",
+                text: "Image has beed Update",
+                icon: "success",
+              }).then(() => {
+                navigate("/table");
+              });
+            }
+          }
+        }
       }
     } catch (error) {
       console.log(error);
@@ -152,12 +208,21 @@ export default function UpdateItem() {
               Image
               <input
                 name="image_item"
-                value={formEdit.image_item}
-                onChange={handlerChange}
-                type="text"
+                onChange={handleImage}
+                type="file"
                 className="form-input w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
             </label>
+
+            <img
+              className="size-24"
+              src={
+                imagePrev.preview.length > 0
+                  ? imagePrev.preview
+                  : formEdit.image_item
+              }
+              alt={formEdit.image_item}
+            />
 
             {/* Button Update & Back */}
             <div className="flex gap-2">
