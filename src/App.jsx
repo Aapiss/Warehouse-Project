@@ -10,12 +10,13 @@ import UpdateSupplier from "./pages/item/UpdateSupplier";
 import SupplierDetail from "./pages/item/SupplierDetail";
 import Login from "./auth/Login";
 import AuthAdmin from "./auth/AuthAdmin";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login */}
+        {/* User */}
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/table" element={<TableItem />} />
@@ -29,8 +30,11 @@ const App = () => {
         {/* Auth Admin */}
         <Route element={<AuthAdmin />}>
           {/* Edit Items */}
-          <Route path="edit/:id" element={<UpdateItem />}></Route>
-          <Route path="edit-supplier/:id" element={<UpdateSupplier />}></Route>
+          <Route path="edit/:id" element={<UpdateItem />} />
+          <Route path="edit-supplier/:id" element={<UpdateSupplier />} />
+
+          {/* Profile */}
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

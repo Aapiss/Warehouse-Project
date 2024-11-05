@@ -19,6 +19,7 @@ const AuthProvider = ({ children }) => {
 
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(""); // Tambahkan state untuk avatar
 
   const [loading, setLoading] = useState(false);
 
@@ -47,10 +48,12 @@ const AuthProvider = ({ children }) => {
         const { data: userData } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", userId);
+          .eq("id", userId)
+          .single();
 
-        setUsername(userData[0].username);
-        setRole(userData[0].role);
+        setUsername(userData.username);
+        setRole(userData.role);
+        setAvatarUrl(userData.avatar_url); // Set avatar URL dari tabel profiles
       } catch (error) {
         console.log(error);
       }
@@ -73,7 +76,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ login, logout, user, role, username, auth, loading }}
+      value={{ login, logout, user, role, username, avatarUrl, auth, loading }}
     >
       {loading ? <Loading /> : children}
     </AuthContext.Provider>
